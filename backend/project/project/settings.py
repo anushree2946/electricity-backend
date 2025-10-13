@@ -27,8 +27,8 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "electricity-backend.onrender.com",      # Backend Render domain
-    "electricity-frontend.netlify.app"       # Frontend Netlify domain
+    "electricityconnect.onrender.com",   # ✅ your actual Render backend URL
+    "electricity-frontend.netlify.app"   # ✅ your actual frontend URL
 ]
 
 # ===========================
@@ -133,7 +133,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS SETTINGS
 # ===========================
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",                     # Local React dev server
+    "http://localhost:3000",                   # React local dev
+    "https://electricity-frontend.netlify.app" # ✅ your deployed frontend
 ]
-
 # For debugging only, if CORS issues persist:
+CORS_ALLOW_CREDENTIALS = True
