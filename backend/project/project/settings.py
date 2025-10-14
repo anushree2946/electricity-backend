@@ -121,6 +121,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR /'staticfiles'  # Where collectstatic stores files
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
 # Whitenoise compression
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
