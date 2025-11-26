@@ -27,12 +27,12 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "electricity-board-q9zx.onrender.com",  # ✅ your actual Render backend URL from logs
+    "electricity-board-app.onrender.com",   # <-- Add this
     "electricity-frontend.netlify.app"      # ✅ your frontend (if you have one)
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://electricity-board-q9zx.onrender.com',
+    "https://electricity-board-app.onrender.com",
     'http://localhost:3000/'
 ]
 
@@ -145,4 +145,4 @@ CORS_ALLOWED_ORIGINS = [
 ]
 # For debugging only, if CORS issues persist:
 CORS_ALLOW_CREDENTIALS = True
-DEBUG = True
+DEBUG = False
