@@ -1,14 +1,15 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key')
+SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-default-for-dev")
 
-DEBUG = False  # Change to False for production
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -19,11 +20,17 @@ ALLOWED_HOSTS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://electricity-board-app.onrender.com",
+    "https://electricity-frontend.netlify.app",
     "http://localhost:3000"
 ]
 
+# --------------------------------
+# INSTALLED APPS
+# --------------------------------
 INSTALLED_APPS = [
     "corsheaders",
+    "rest_framework",
+    "rest_framework_simplejwt",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -33,10 +40,13 @@ INSTALLED_APPS = [
     "app",
 ]
 
+# --------------------------------
+# MIDDLEWARE
+# --------------------------------
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -45,17 +55,17 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
 ROOT_URLCONF = 'project.urls'
 WSGI_APPLICATION = 'project.wsgi.application'
 
-
-# ----------------------------
-#  TEMPLATE CONFIG (React Build)
-# ----------------------------
+# --------------------------------
+# TEMPLATES (React Build)
+# --------------------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "frontend" / "build"],  # FIXED PATH
+        'DIRS': [os.path.join(BASE_DIR, 'frontend', 'build')],  # <-- FIXED
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,6 +78,10 @@ TEMPLATES = [
     },
 ]
 
+
+# --------------------------------
+# DATABASE
+# --------------------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -75,27 +89,45 @@ DATABASES = {
     }
 }
 
-# ----------------------------
+
+# --------------------------------
 # STATIC + WHITENOISE CONFIG
-# ----------------------------
+# --------------------------------
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATICFILES_DIRS = [
-    BASE_DIR / "frontend" / "build" / "static",  # FIXED PATH
+    os.path.join(BASE_DIR, 'frontend', 'build', 'static')  # <-- FIXED
 ]
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# ----------------------------
-#   CORS SETTINGS
-# ----------------------------
+# --------------------------------
+# CORS CONFIG
+# --------------------------------
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://electricity-frontend.netlify.app"
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://electricity-frontend.netlify.app",
 ]
-
 CORS_ALLOW_CREDENTIALS = True
+
+# --------------------------------
+# REST FRAMEWORK + JWT CONFIG
+# --------------------------------
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}

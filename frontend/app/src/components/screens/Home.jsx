@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import API_BASE_URL from "../../api"; 
+import API_BASE_URL from "../../api";
 import { Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -16,55 +16,76 @@ function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ===========================
-  // Fetch Data from Django API
-  // ===========================
+  // Redirect if not logged in
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "/login";
+  }, []);
 
-        // ⭐ FINAL FIXED URL ⭐
-        let url = `${API_BASE_URL}/api/getApplicantsData?page=${currentPage}`;
-
-        if (startDate && endDate) {
-          url += `&start_date=${startDate.toISOString().split("T")[0]}&end_date=${endDate
-            .toISOString()
-            .split("T")[0]}`;
-        }
-
-        if (searchQuery.trim()) {
-          url += `&search=${encodeURIComponent(searchQuery.trim())}`;
-        }
-
-        console.log("Fetching data from:", url);
-
-        const response = await axios.get(url);
-        const jsonData = response.data;
-
-        console.log("API Response:", jsonData);
-
-        setData(jsonData.data || []);
-        setTotalPages(jsonData.total_pages || 1);
-
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+  // Fetch Data whenever filters/page changes
+  useEffect(() => {
     fetchData();
   }, [currentPage, startDate, endDate, searchQuery]);
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "/login";
+        return;
+      }
+
+      let url = `${API_BASE_URL}/api/getApplicantsData/?page=${currentPage}`;
+
+      if (startDate && endDate) {
+        url += `&start_date=${startDate.toISOString().split("T")[0]}&end_date=${endDate
+          .toISOString()
+          .split("T")[0]}`;
+      }
+
+      if (searchQuery.trim()) {
+        url += `&search=${encodeURIComponent(searchQuery.trim())}`;
+      }
+
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setData(res.data.data || []);
+      setTotalPages(res.data.total_pages || 1);
+    } catch (error) {
+      console.error("Fetch Error:", error);
+
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
+
   return (
     <div className="container mt-2">
-      <h1>Applicant Details</h1>
+      <div className="d-flex justify-content-between align-items-center">
+        <h1>Applicant Details</h1>
+        <button className="btn btn-danger" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+
       <hr />
 
-      {/* Filters */}
       <Row>
         <p>Filter By Date of Application</p>
+
         <Col md={2}>
           <DatePicker
             selected={startDate}
@@ -73,6 +94,7 @@ function Home() {
             placeholderText="From Date"
           />
         </Col>
+
         <Col md={2}>
           <DatePicker
             selected={endDate}
@@ -94,9 +116,9 @@ function Home() {
           />
         </Col>
       </Row>
+
       <hr />
 
-      {/* Table */}
       <div className="table-container">
         {loading ? (
           <p className="text-center">Loading data...</p>
@@ -110,16 +132,10 @@ function Home() {
                 <th>District</th>
                 <th>State</th>
                 <th>Pincode</th>
-                <th>Ownership</th>
-                <th>Govt ID Type</th>
-                <th>ID Number</th>
-                <th>Category</th>
                 <th>Load Applied</th>
                 <th>Date of Application</th>
                 <th>Status</th>
-                <th>Reviewer ID</th>
                 <th>Reviewer Name</th>
-                <th>Reviewer Comments</th>
                 <th>Edit</th>
               </tr>
             </thead>
@@ -129,21 +145,16 @@ function Home() {
                 data.map((connection) => (
                   <tr key={connection.id}>
                     <td>{connection.id}</td>
-                    <td>{connection.Applicant?.Applicant_Name || "N/A"}</td>
-                    <td>{connection.Applicant?.Gender || "N/A"}</td>
-                    <td>{connection.Applicant?.District || "N/A"}</td>
-                    <td>{connection.Applicant?.State || "N/A"}</td>
-                    <td>{connection.Applicant?.Pincode || "N/A"}</td>
-                    <td>{connection.Applicant?.Ownership || "N/A"}</td>
-                    <td>{connection.Applicant?.GovtID_Type || "N/A"}</td>
-                    <td>{connection.Applicant?.ID_Number || "N/A"}</td>
-                    <td>{connection.Applicant?.Category || "N/A"}</td>
-                    <td>{connection.Load_Applied || "N/A"}</td>
-                    <td>{connection.Date_of_Application || "N/A"}</td>
-                    <td>{connection.Status || "N/A"}</td>
-                    <td>{connection.Reviewer_ID || "N/A"}</td>
-                    <td>{connection.Reviewer_Name || "N/A"}</td>
-                    <td>{connection.Reviewer_Comments || "N/A"}</td>
+                    <td>{connection.Applicant?.Applicant_Name || "-"}</td>
+                    <td>{connection.Applicant?.Gender || "-"}</td>
+                    <td>{connection.Applicant?.District || "-"}</td>
+                    <td>{connection.Applicant?.State || "-"}</td>
+                    <td>{connection.Applicant?.Pincode || "-"}</td>
+                    <td>{connection.Load_Applied}</td>
+                    <td>{connection.Date_of_Application}</td>
+                    <td>{connection.Status}</td>
+                    <td>{connection.Reviewer_Name || "-"}</td>
+
                     <td>
                       <Link
                         to={`/editApplicant/${connection.id}`}
@@ -156,7 +167,7 @@ function Home() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="17" className="text-center">
+                  <td colSpan="11" className="text-center">
                     No data available
                   </td>
                 </tr>
@@ -166,28 +177,42 @@ function Home() {
         )}
       </div>
 
-      {/* Pagination */}
-      <div className="container">
-        <ul className="pagination">
+      {/* PAGINATION BLOCK (important) */}
+      <div className="container mt-3">
+        <ul className="pagination justify-content-center">
+
+          {/* First Page */}
           <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
             <button onClick={() => setCurrentPage(1)} className="page-link">
-              Go to First
+              First
             </button>
           </li>
 
-          {Array.from({ length: totalPages }).map((_, i) => (
-            <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-              <button onClick={() => setCurrentPage(i + 1)} className="page-link">
-                {i + 1}
+          {/* Page Numbers */}
+          {Array.from({ length: totalPages }).map((_, index) => (
+            <li
+              key={index}
+              className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
+            >
+              <button
+                onClick={() => setCurrentPage(index + 1)}
+                className="page-link"
+              >
+                {index + 1}
               </button>
             </li>
           ))}
 
+          {/* Last Page */}
           <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-            <button onClick={() => setCurrentPage(totalPages)} className="page-link">
-              Go to Last
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              className="page-link"
+            >
+              Last
             </button>
           </li>
+
         </ul>
       </div>
     </div>
