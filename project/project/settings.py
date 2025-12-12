@@ -18,11 +18,16 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # Render will set ALLOWED_HOSTS using env var
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "electricity-backend.onrender.com",   # <-- your Render backend URL
+    "electricity-frontend.netlify.app",   # <-- your frontend URL
+]
 
 # CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
-    "https://electricity-board-app.onrender.com",
+    "https://electricity-backend.onrender.com",
     "https://electricity-frontend.netlify.app",
 ]
 
