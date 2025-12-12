@@ -1,19 +1,13 @@
 services:
   - type: web
     name: electricity-backend
+    rootDir: project
     env: python
-
-    # Run from directory where manage.py is located
-    rootDirectory: ./backend/project
-
-    buildCommand: "pip install -r ../requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput"
-
-    startCommand: "gunicorn project.wsgi:application"
-
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py migrate
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn core.wsgi:application
     envVars:
-      - key: SECRET_KEY
-        sync: false
-      - key: ALLOWED_HOSTS
-        sync: false
-      - key: DEBUG
-        sync: false
+      - key: DJANGO_SETTINGS_MODULE
+        value: core.settings
