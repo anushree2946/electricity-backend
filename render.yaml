@@ -2,20 +2,23 @@ services:
   - type: web
     name: electricity-backend
     env: python
-    rootDirectory: backend
-    region: oregon
-    plan: free
 
-    buildCommand: |
-      pip install -r requirements.txt
-      python project/manage.py migrate
-      python project/manage.py collectstatic --noinput
+    # IMPORTANT: run from folder that contains manage.py
+    rootDirectory: ./backend/project
 
-    startCommand: |
-      gunicorn project.project.wsgi:application
+    # If your requirements file is at backend/requirements.txt use ../requirements.txt
+    # If your requirements file is at repo root use ../../requirements.txt instead.
+    buildCommand: "pip install -r ../requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput"
+
+    # Run gunicorn from this directory. The Django package name inside is `project`
+    startCommand: "gunicorn project.wsgi:application"
 
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.13.4
-      - key: DJANGO_SETTINGS_MODULE
-        value: project.settings
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: DEBUG
+        sync: false
