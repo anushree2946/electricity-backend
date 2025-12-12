@@ -3,17 +3,19 @@ services:
     name: electricity-backend
     env: python
     rootDirectory: backend
+    region: oregon
+    plan: free
 
-    buildCommand: "
-      pip install -r requirements.txt &&
-      python project/manage.py migrate &&
+    buildCommand: |
+      pip install -r requirements.txt
+      python project/manage.py migrate
       python project/manage.py collectstatic --noinput
-    "
 
-    startCommand: "gunicorn project.wsgi:application"
+    startCommand: |
+      gunicorn project.project.wsgi:application
 
     envVars:
-      - key: SECRET_KEY
-        sync: false
-      - key: ALLOWED_HOSTS
-        sync: false
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: DJANGO_SETTINGS_MODULE
+        value: project.settings
