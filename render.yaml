@@ -2,10 +2,10 @@ services:
   - type: web
     name: electricity-backend
     env: python
-    rootDirectory: ./backend
 
-    buildCommand: "pip install -r requirements.txt && python project/manage.py collectstatic --noinput"
+    rootDirectory: ./backend/project
 
+    buildCommand: "pip install -r ../../requirements.txt && python manage.py collectstatic --noinput"
     startCommand: "gunicorn project.wsgi:application"
 
     envVars:
