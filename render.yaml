@@ -1,11 +1,13 @@
 services:
   - type: web
-    name: fullstack_project1
+    name: electricity-backend
     env: python
-    buildCommand: "./build.sh"
-    startCommand: "cd project && gunicorn project.asgi:application -k uvicorn.workers.UvicornWorker"
+    rootDirectory: ./
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn project.wsgi:application"
+
     envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: project.settings
-      - key: PYTHON_VERSION
-        value: 3.13.4
+      - key: SECRET_KEY
+        sync: false
+      - key: ALLOWED_HOSTS
+        sync: false
