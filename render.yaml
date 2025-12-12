@@ -2,9 +2,10 @@ services:
   - type: web
     name: electricity-backend
     env: python
-    rootDirectory: .
-    buildCommand: "pip install -r backend/requirements.txt && python backend/project/manage.py collectstatic --noinput"
-    startCommand: "gunicorn project.wsgi:application --chdir backend/project"
+    rootDirectory: backend
+
+    buildCommand: "pip install -r requirements.txt && python project/manage.py migrate && python project/manage.py collectstatic --noinput"
+    startCommand: "gunicorn project.wsgi:application"
 
     envVars:
       - key: SECRET_KEY
