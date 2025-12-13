@@ -1,5 +1,5 @@
 """
-ASGI config for project project.
+ASGI config for your Django project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -8,10 +8,9 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/asgi/
 """
 
 import os
-
 from django.core.asgi import get_asgi_application
 
-settings_module = 'api.deployment_setting' if 'RENDER_EXTERNAL_HOSTNAME' in os.environ else 'api.settings'
+# Use core.settings for both development & deployment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 
 application = get_asgi_application()
