@@ -1,8 +1,8 @@
 services:
   - type: web
     name: electricity-backend
-    rootDir: project
     env: python
+    rootDir: backend
     buildCommand: |
       pip install -r requirements.txt
       python manage.py migrate
@@ -11,3 +11,5 @@ services:
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: core.settings
+      - key: PYTHONUNBUFFERED
+        value: "1"
