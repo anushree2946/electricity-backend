@@ -66,8 +66,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "project.urls"
-WSGI_APPLICATION = "project.wsgi.application"
+ROOT_URLCONF = 'core.urls'
+WSGI_APPLICATION = 'core.wsgi.application'
 
 # ----------------------------------------------------
 # TEMPLATES (Backend Only — frontend deployed separately)
